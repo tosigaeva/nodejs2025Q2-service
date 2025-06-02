@@ -7,17 +7,17 @@ import {
 } from '@nestjs/common';
 import { ArtistRepository } from './artist.repository';
 import { Artist } from './entities/artist.entity';
-import { AlbumRepository } from '../album/album.repository';
-import { TrackRepository } from '../track/track.repository';
+import { AlbumService } from '../album/album.service';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
     private readonly artistRepository: ArtistRepository,
-    @Inject(forwardRef(() => AlbumRepository))
-    private readonly albumRepository: AlbumRepository,
-    @Inject(forwardRef(() => TrackRepository))
-    private readonly trackRepository: TrackRepository,
+    @Inject(forwardRef(() => AlbumService))
+    private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
   ) {}
 
   getAll(): Artist[] {
@@ -43,7 +43,7 @@ export class ArtistService {
     if (!this.artistRepository.delete(id)) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
-    this.albumRepository.removeArtist(id);
-    this.trackRepository.removeArtist(id);
+    this.albumService.removeArtist(id);
+    this.trackService.removeArtist(id);
   }
 }

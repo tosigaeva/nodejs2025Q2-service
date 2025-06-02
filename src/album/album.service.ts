@@ -25,4 +25,8 @@ export class AlbumService {
   delete(id: string): void {
     this.albumRepository.delete(id);
   }
+
+  removeArtist(artistId: string) {
+    this.albumRepository.removeArtist(artistId);
+  }
 }

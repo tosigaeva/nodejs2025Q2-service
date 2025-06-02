@@ -35,4 +35,8 @@ export class TrackService {
   delete(id: string): void {
     this.trackRepository.delete(id);
   }
+
+  removeArtist(artistId: string) {
+    this.trackRepository.removeArtist(artistId);
+  }
 }
