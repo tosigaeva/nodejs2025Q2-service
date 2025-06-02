@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UuidValidationPipe } from '../pipes/uuid-validation.pipe';
 
 @Controller('user')
 export class UserController {
@@ -24,7 +25,7 @@ export class UserController {
   }
 
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<User> {
+  async getById(@Param('id', UuidValidationPipe) id: string): Promise<User> {
     return this.userService.getById(id);
   }
 
@@ -35,7 +36,7 @@ export class UserController {
 
   @Put(':id')
   async updatePassword(
-    @Param('id') id: string,
+    @Param('id', UuidValidationPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): Promise<User> {
     return this.userService.updatePassword(
@@ -47,7 +48,7 @@ export class UserController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id') id: string): Promise<void> {
+  async delete(@Param('id', UuidValidationPipe) id: string): Promise<void> {
     return this.userService.delete(id);
   }
 }
