@@ -57,7 +57,7 @@ export class UserRepository {
 
   private sanitizeUser(user: User): User {
     const { password, ...sanitizedUser } = user;
-    console.info(password);
+    if (password.length < 0) console.info(password);
     return sanitizedUser as User;
   }
 }
