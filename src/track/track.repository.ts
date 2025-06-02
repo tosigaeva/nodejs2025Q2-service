@@ -38,9 +38,15 @@ export class TrackRepository {
     }
   }
 
-  removeArtist(artistId: string) {
-    this.tracks.forEach((album) => {
-      if (album.artistId === artistId) album.artistId = null;
+  removeArtist(artistId: string): void {
+    this.tracks.forEach((track) => {
+      if (track.artistId === artistId) track.artistId = null;
+    });
+  }
+
+  removeAlbum(albumId: string): void {
+    this.tracks.forEach((track) => {
+      if (track.albumId === albumId) track.albumId = null;
     });
   }
 }

@@ -39,4 +39,8 @@ export class TrackService {
   removeArtist(artistId: string) {
     this.trackRepository.removeArtist(artistId);
   }
+
+  removeAlbum(albumId: string) {
+    this.trackRepository.removeAlbum(albumId);
+  }
 }

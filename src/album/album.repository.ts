@@ -36,10 +36,8 @@ export class AlbumRepository {
     return updated;
   }
 
-  delete(id: string): void {
-    if (!this.albums.delete(id)) {
-      throw new NotFoundException(`Album with id ${id} not found`);
-    }
+  delete(id: string): boolean {
+    return this.albums.delete(id);
   }
 
   removeArtist(artistId: string) {

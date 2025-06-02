@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AlbumRepository } from './album.repository';
 import { Album } from './entities/album.entity';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly albumRepository: AlbumRepository) {}
+  constructor(
+    private readonly albumRepository: AlbumRepository,
+    private readonly trackService: TrackService,
+  ) {}
 
   getAll(): Album[] {
     return this.albumRepository.findAll();
@@ -23,7 +27,10 @@ export class AlbumService {
   }
 
   delete(id: string): void {
-    this.albumRepository.delete(id);
+    if (!this.albumRepository.delete(id)) {
+      throw new NotFoundException(`Album with id ${id} not found`);
+    }
+    this.trackService.removeAlbum(id);
   }
 
   removeArtist(artistId: string) {
