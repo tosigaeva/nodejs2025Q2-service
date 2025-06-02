@@ -11,10 +11,7 @@ export class UserRepository {
   }
 
   findById(id: string): User {
-    const user = this.users.get(id);
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
+    const user = this.getUnsanitizedUser(id);
     return this.sanitizeUser(user);
   }
 
@@ -43,6 +40,19 @@ export class UserRepository {
     if (!this.users.delete(id)) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
+  }
+
+  validatePassword(id: string, password: string): boolean {
+    const user = this.getUnsanitizedUser(id);
+    return user.password === password;
+  }
+
+  private getUnsanitizedUser(id: string): User {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return user;
   }
 
   private sanitizeUser(user: User): User {

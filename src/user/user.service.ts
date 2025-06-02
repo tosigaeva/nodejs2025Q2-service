@@ -39,12 +39,11 @@ export class UserService {
       throw new BadRequestException('New password is required');
     }
 
-    const user = this.userRepository.findById(id);
-
-    if (user.password !== oldPassword) {
+    if (!this.userRepository.validatePassword(id, oldPassword)) {
       throw new ForbiddenException('Old password is incorrect');
     }
 
+    const user = this.userRepository.findById(id);
     const updatedUser = {
       ...user,
       password: newPassword,
