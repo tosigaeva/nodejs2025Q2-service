@@ -2,7 +2,8 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  NotFoundException, UnprocessableEntityException,
+  NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Favorites } from './entities/favorites.entity';
 import { TrackService } from '../track/track.service';
