@@ -9,6 +9,7 @@ import { ArtistRepository } from './artist.repository';
 import { Artist } from './entities/artist.entity';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class ArtistService {
@@ -18,6 +19,8 @@ export class ArtistService {
     private readonly albumService: AlbumService,
     @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   getAll(): Artist[] {
@@ -45,5 +48,6 @@ export class ArtistService {
     }
     this.albumService.removeArtist(id);
     this.trackService.removeArtist(id);
+    this.favoritesService.cleanArtist(id);
   }
 }

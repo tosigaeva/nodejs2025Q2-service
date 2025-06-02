@@ -19,8 +19,8 @@ export class FavoritesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all favorites' })
-  @ApiResponse({ status: 200, type: Favorites })
-  getAll(): Favorites {
+  @ApiResponse({ status: 200, type: [Favorites] })
+  getAll() {
     return this.favoritesService.getAll();
   }
 
@@ -59,7 +59,13 @@ export class FavoritesController {
   @Post('artist/:id')
   @ApiOperation({ summary: 'Add artist to favorites' })
   @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 201 })
+  @ApiResponse({
+    status: 201,
+    description: 'Artist added to favorites',
+    type: Favorites,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid UUID.' })
+  @ApiResponse({ status: 422, description: 'Artist not found' })
   addArtist(@Param('id', UuidValidationPipe) id: string): void {
     this.favoritesService.addArtist(id);
   }

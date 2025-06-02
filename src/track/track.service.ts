@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { TrackRepository } from './track.repository';
 import { Track } from './entities/track.entity';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private readonly trackRepository: TrackRepository) {}
+  constructor(
+    @Inject(forwardRef(() => TrackRepository))
+    private readonly trackRepository: TrackRepository,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
   getAll(): Track[] {
     return this.trackRepository.findAll();
@@ -34,6 +40,7 @@ export class TrackService {
 
   delete(id: string): void {
     this.trackRepository.delete(id);
+    this.favoritesService.cleanTrack(id);
   }
 
   removeArtist(artistId: string) {
