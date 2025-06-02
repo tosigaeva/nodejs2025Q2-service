@@ -41,4 +41,10 @@ export class AlbumRepository {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
   }
+
+  removeArtist(artistId: string) {
+    this.albums.forEach((album) => {
+      if (album.artistId === artistId) album.artistId = null;
+    });
+  }
 }

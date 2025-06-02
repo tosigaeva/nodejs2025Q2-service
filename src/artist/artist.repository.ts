@@ -35,9 +35,7 @@ export class ArtistRepository {
     return updated;
   }
 
-  delete(id: string): void {
-    if (!this.artists.delete(id)) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
+  delete(id: string): boolean {
+    return this.artists.delete(id);
   }
 }

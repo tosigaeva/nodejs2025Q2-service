@@ -37,4 +37,10 @@ export class TrackRepository {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
   }
+
+  removeArtist(artistId: string) {
+    this.tracks.forEach((album) => {
+      if (album.artistId === artistId) album.artistId = null;
+    });
+  }
 }
