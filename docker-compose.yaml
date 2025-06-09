@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - db
+    restart: always
+    env_file: .env
+    networks:
+      - library-net
+  db:
+    image: postgres:13-alpine
+    container_name: db
+    restart: always
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - library-net
+networks:
+  library-net:
+    driver: bridge
+volumes:
+  pgdata:
