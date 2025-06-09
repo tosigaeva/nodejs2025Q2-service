@@ -8,7 +8,17 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/tosigaeva/nodejs2025Q2-service.git
+```
+
+## Changing directory
+```
+cd nodejs2025Q2-service
+```
+
+## Switching branch
+```
+git switch rest-service
 ```
 
 ## Installing NPM modules
