@@ -1,109 +1,84 @@
 import {
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Favorites } from './entities/favorites.entity';
-import { TrackService } from '../track/track.service';
-import { AlbumService } from '../album/album.service';
-import { ArtistService } from '../artist/artist.service';
+import { PrismaService } from '../client/prisma.service';
+import { Album, Artist, Track } from '@prisma/client';
 
 @Injectable()
 export class FavoritesService {
-  private favorites: { artists: string[]; albums: string[]; tracks: string[] } =
-    {
-      artists: [],
-      albums: [],
-      tracks: [],
-    };
+  constructor(private storage: PrismaService) {}
 
-  constructor(
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
-    @Inject(forwardRef(() => AlbumService))
-    private readonly albumService: AlbumService,
-    @Inject(forwardRef(() => ArtistService))
-    private readonly artistService: ArtistService,
-  ) {}
-
-  getAll(): Favorites {
+  async getAll(): Promise<{
+    artists: Artist[];
+    albums: Album[];
+    tracks: Track[];
+  }> {
     return {
-      artists: this.favorites.artists.map((id) =>
-        this.artistService.getById(id),
-      ),
-      albums: this.favorites.albums.map((id) => this.albumService.getById(id)),
-      tracks: this.favorites.tracks.map((id) => this.trackService.getById(id)),
+      artists: await this.storage.favoriteArtist.findMany().then((items) => {
+        return this.storage.artist.findMany({
+          where: { id: { in: items.map((item) => item.artistId) } },
+        });
+      }),
+      albums: await this.storage.favoriteAlbum.findMany().then((items) => {
+        return this.storage.album.findMany({
+          where: { id: { in: items.map((item) => item.albumId) } },
+        });
+      }),
+      tracks: await this.storage.favoriteTrack.findMany().then((items) => {
+        return this.storage.track.findMany({
+          where: { id: { in: items.map((item) => item.trackId) } },
+        });
+      }),
     };
   }
 
-  addTrack(id: string): void {
+  async addTrack(id: string) {
+    const track = await this.storage.track.findUnique({
+      where: { id },
+    });
+    if (!track) throw new UnprocessableEntityException('Track does not exist');
+    await this.storage.favoriteTrack.create({ data: { trackId: id } });
+  }
+
+  async removeTrack(id: string) {
     try {
-      this.trackService.getById(id);
+      await this.storage.favoriteTrack.delete({ where: { trackId: id } });
     } catch {
-      throw new UnprocessableEntityException('Track does not exist');
-    }
-    if (!this.favorites.tracks.includes(id)) {
-      this.favorites.tracks.push(id);
+      throw new NotFoundException('Track is not in favorites');
     }
   }
 
-  removeTrack(id: string): void {
-    const index = this.favorites.tracks.indexOf(id);
-    if (index === -1) throw new NotFoundException('Track is not in favorites');
-    this.favorites.tracks.splice(index, 1);
+  async addAlbum(id: string) {
+    const album = await this.storage.album.findUnique({
+      where: { id },
+    });
+    if (!album) throw new UnprocessableEntityException('Album does not exist');
+    await this.storage.favoriteAlbum.create({ data: { albumId: id } });
   }
 
-  addAlbum(id: string): void {
+  async removeAlbum(id: string) {
     try {
-      this.albumService.getById(id);
+      await this.storage.favoriteAlbum.delete({ where: { albumId: id } });
     } catch {
-      throw new UnprocessableEntityException('Album does not exist');
-    }
-    if (!this.favorites.albums.includes(id)) {
-      this.favorites.albums.push(id);
+      throw new NotFoundException('Album is not in favorites');
     }
   }
 
-  removeAlbum(id: string): void {
-    const index = this.favorites.albums.indexOf(id);
-    if (index === -1) throw new NotFoundException('Album is not in favorites');
-    this.favorites.albums.splice(index, 1);
+  async addArtist(id: string) {
+    const album = await this.storage.artist.findUnique({
+      where: { id },
+    });
+    if (!album) throw new UnprocessableEntityException('Artist does not exist');
+    await this.storage.favoriteArtist.create({ data: { artistId: id } });
   }
 
-  addArtist(id: string): void {
+  async removeArtist(id: string) {
     try {
-      this.artistService.getById(id);
+      await this.storage.favoriteArtist.delete({ where: { artistId: id } });
     } catch {
-      throw new UnprocessableEntityException('Artist does not exist');
+      throw new NotFoundException('Artist is not in favorites');
     }
-    if (!this.favorites.artists.includes(id)) {
-      this.favorites.artists.push(id);
-    }
-  }
-
-  removeArtist(id: string): void {
-    const index = this.favorites.artists.indexOf(id);
-    if (index === -1) throw new NotFoundException('Artist is not in favorites');
-    this.favorites.artists.splice(index, 1);
-  }
-
-  cleanArtist(artistId: string) {
-    this.favorites.artists = this.favorites.artists.filter(
-      (id) => id !== artistId,
-    );
-  }
-
-  cleanAlbum(albumId: string) {
-    this.favorites.albums = this.favorites.albums.filter(
-      (id) => id !== albumId,
-    );
-  }
-
-  cleanTrack(trackId: string) {
-    this.favorites.tracks = this.favorites.tracks.filter(
-      (id) => id !== trackId,
-    );
   }
 }

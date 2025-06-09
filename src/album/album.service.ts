@@ -20,28 +20,34 @@ export class AlbumService {
     private readonly favoritesService: FavoritesService,
   ) {}
 
-  getAll(): Album[] {
-    return this.albumRepository.findAll();
+  async getAll(): Promise<Album[]> {
+    return await this.albumRepository.findAll();
   }
 
-  getById(id: string): Album {
+  async getById(id: string): Promise<Album> {
     return this.albumRepository.findById(id);
   }
 
-  create(name: string, year: number, artistId?: string | null): Album {
+  async create(
+    name: string,
+    year: number,
+    artistId?: string | null,
+  ): Promise<Album> {
     return this.albumRepository.create(name, year, artistId ?? null);
   }
 
-  update(id: string, update: Partial<Album>): Album {
+  async update(id: string, update: Partial<Album>): Promise<Album> {
     return this.albumRepository.update(id, update);
   }
 
-  delete(id: string): void {
-    if (!this.albumRepository.delete(id)) {
+  async delete(id: string): Promise<void> {
+    try {
+      await this.albumRepository.delete(id);
+    } catch {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
-    this.trackService.removeAlbum(id);
-    this.favoritesService.cleanAlbum(id);
+    // this.trackService.removeAlbum(id);
+    // this.favoritesService.cleanAlbum(id);
   }
 
   removeArtist(artistId: string) {

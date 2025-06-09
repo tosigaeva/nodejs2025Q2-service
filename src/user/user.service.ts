@@ -11,13 +11,13 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  getAll(): User[] {
-    return this.userRepository.findAll();
+  async getAll() {
+    return await this.userRepository.findAll();
   }
 
-  getById(id: string): User {
+  async getById(id: string) {
     try {
-      return this.userRepository.findById(id);
+      return await this.userRepository.findById(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(`User with id ${id} not found`);

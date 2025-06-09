@@ -1,52 +1,65 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Track } from './entities/track.entity';
 import { randomUUID } from 'crypto';
+import { PrismaService } from '../client/prisma.service';
+import { Track } from '@prisma/client';
 
 @Injectable()
 export class TrackRepository {
-  private tracks = new Map<string, Track>();
+  constructor(private storage: PrismaService) {}
 
-  findAll(): Track[] {
-    return Array.from(this.tracks.values());
+  async findAll(): Promise<Track[]> {
+    return this.storage.track.findMany();
   }
 
-  findById(id: string): Track {
-    const track = this.tracks.get(id);
+  async findById(id: string): Promise<Track> {
+    const track = await this.storage.track.findUnique({ where: { id } });
     if (!track) throw new NotFoundException(`Track with id ${id} not found`);
     return track;
   }
 
-  create(data: Omit<Track, 'id'>): Track {
+  async create(data: Omit<Track, 'id'>): Promise<Track> {
     const track: Track = {
       id: randomUUID(),
       ...data,
     };
-    this.tracks.set(track.id, track);
-    return track;
+    return this.storage.track.create({
+      data: {
+        name: track.name,
+        duration: track.duration,
+        artist: {
+          connect: track.artistId ? { id: track.artistId } : undefined,
+        },
+        album: {
+          connect: track.albumId ? { id: track.albumId } : undefined,
+        },
+      },
+    });
   }
 
-  update(id: string, update: Partial<Track>): Track {
-    const existing = this.findById(id);
+  async update(id: string, update: Partial<Track>): Promise<Track> {
+    const existing = await this.storage.track.findUnique({ where: { id } });
     const updated = { ...existing, ...update };
-    this.tracks.set(id, updated);
-    return updated;
+    return this.storage.track.update({
+      where: { id },
+      data: {
+        name: updated.name,
+        duration: updated.duration,
+        artist: {
+          connect: updated.artistId ? { id: updated.artistId } : undefined,
+        },
+        album: {
+          connect: updated.albumId ? { id: updated.albumId } : undefined,
+        },
+      },
+    });
   }
 
-  delete(id: string): void {
-    if (!this.tracks.delete(id)) {
+  async delete(id: string): Promise<void> {
+    try {
+      await this.storage.track.delete({ where: { id } });
+    } catch {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
-  }
-
-  removeArtist(artistId: string): void {
-    this.tracks.forEach((track) => {
-      if (track.artistId === artistId) track.artistId = null;
-    });
-  }
-
-  removeAlbum(albumId: string): void {
-    this.tracks.forEach((track) => {
-      if (track.albumId === albumId) track.albumId = null;
-    });
+    await this.storage.favoriteTrack.deleteMany({ where: { trackId: id } });
   }
 }

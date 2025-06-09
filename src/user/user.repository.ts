@@ -1,21 +1,49 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { randomUUID } from 'crypto';
+import { PrismaService } from '../client/prisma.service';
 
 @Injectable()
 export class UserRepository {
-  private users = new Map<string, User>();
+  constructor(private storage: PrismaService) {}
 
-  findAll(): User[] {
-    return Array.from(this.users.values()).map(this.sanitizeUser);
+  async findAll(): Promise<User> {
+    const users = await this.storage.user.findMany({
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return users.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.getTime(),
+      updatedAt: user.updatedAt.getTime(),
+    }));
   }
 
-  findById(id: string): User {
-    const user = this.getUnsanitizedUser(id);
-    return this.sanitizeUser(user);
+  async findById(id: string): Promise<User> {
+    const user = await this.storage.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    if (!user) throw new NotFoundException('User not found');
+    return {
+      ...user,
+      createdAt: user.createdAt.getTime(),
+      updatedAt: user.updatedAt.getTime(),
+    };
   }
 
-  create(login: string, password: string): User {
+  async create(login: string, password: string) {
     const newUser: User = {
       id: randomUUID(),
       login,
@@ -24,31 +52,62 @@ export class UserRepository {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    this.users.set(newUser.id, newUser);
+
+    await this.storage.user.create({
+      data: {
+        login: newUser.login,
+        password: newUser.password,
+        version: 1,
+      },
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
     return this.sanitizeUser(newUser);
   }
 
-  update(user: User): User {
-    if (!this.users.has(user.id)) {
+  async update(user: User) {
+    if (!(await this.getUnsanitizedUser(user.id))) {
       throw new NotFoundException(`User with id ${user.id} not found`);
     }
-    this.users.set(user.id, user);
+    await this.storage.user.update({
+      where: { id: user.id },
+      data: {
+        password: user.password,
+        version: user.version,
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        login: true,
+        version: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
     return this.sanitizeUser(user);
   }
 
-  delete(id: string): void {
-    if (!this.users.delete(id)) {
-      throw new NotFoundException(`User with id ${id} not found`);
+  async delete(id: string) {
+    try {
+      await this.storage.user.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException('User not found');
     }
   }
 
-  validatePassword(id: string, password: string): boolean {
-    const user = this.getUnsanitizedUser(id);
+  async validatePassword(id: string, password: string) {
+    const user = await this.getUnsanitizedUser(id);
     return user.password === password;
   }
 
-  private getUnsanitizedUser(id: string): User {
-    const user = this.users.get(id);
+  private async getUnsanitizedUser(id: string) {
+    const user = await this.storage.user.findById(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }

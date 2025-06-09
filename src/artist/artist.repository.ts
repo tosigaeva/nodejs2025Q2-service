@@ -1,41 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Artist } from './entities/artist.entity';
 import { randomUUID } from 'crypto';
+import { PrismaService } from '../client/prisma.service';
+import { Artist } from '@prisma/client';
 
 @Injectable()
 export class ArtistRepository {
-  private artists = new Map<string, Artist>();
+  constructor(private storage: PrismaService) {}
 
-  findAll(): Artist[] {
-    return Array.from(this.artists.values());
+  async findAll(): Promise<Artist[]> {
+    return this.storage.artist.findMany();
   }
 
-  findById(id: string): Artist {
-    const artist = this.artists.get(id);
+  async findById(id: string): Promise<Artist> {
+    const artist = await this.storage.artist.findUnique({ where: { id } });
     if (!artist) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
     return artist;
   }
 
-  create(name: string, grammy: boolean): Artist {
+  async create(name: string, grammy: boolean): Promise<Artist> {
     const newArtist: Artist = {
       id: randomUUID(),
       name,
       grammy,
     };
-    this.artists.set(newArtist.id, newArtist);
-    return newArtist;
+    return this.storage.artist.create({ data: newArtist });
   }
 
-  update(id: string, updates: Partial<Artist>): Artist {
+  async update(id: string, updates: Partial<Artist>): Promise<Artist> {
     const existing = this.findById(id);
     const updated = { ...existing, ...updates };
-    this.artists.set(id, updated);
-    return updated;
+    return this.storage.artist.update({
+      where: { id },
+      data: updated,
+    });
   }
 
-  delete(id: string): boolean {
-    return this.artists.delete(id);
+  async delete(id: string): Promise<void> {
+    await this.storage.artist.delete({ where: { id } });
   }
 }

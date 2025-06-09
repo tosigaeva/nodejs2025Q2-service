@@ -37,7 +37,7 @@ export class UserController {
   })
   @Get()
   async getAll(): Promise<User[]> {
-    return this.userService.getAll();
+    return await this.userService.getAll();
   }
 
   @Get(':id')
@@ -57,7 +57,7 @@ export class UserController {
     description: 'User not found',
   })
   async getById(@Param('id', UuidValidationPipe) id: string): Promise<User> {
-    return this.userService.getById(id);
+    return await this.userService.getById(id);
   }
 
   @Post()

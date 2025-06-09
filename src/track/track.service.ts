@@ -12,21 +12,21 @@ export class TrackService {
     private readonly favoritesService: FavoritesService,
   ) {}
 
-  getAll(): Track[] {
-    return this.trackRepository.findAll();
+  async getAll() {
+    return await this.trackRepository.findAll();
   }
 
-  getById(id: string): Track {
-    return this.trackRepository.findById(id);
+  async getById(id: string) {
+    return await this.trackRepository.findById(id);
   }
 
-  create(
+  async create(
     name: string,
     duration: number,
     artistId?: string | null,
     albumId?: string | null,
-  ): Track {
-    return this.trackRepository.create({
+  ) {
+    return await this.trackRepository.create({
       name,
       duration,
       artistId: artistId ?? null,
@@ -34,20 +34,19 @@ export class TrackService {
     });
   }
 
-  update(id: string, update: Partial<Track>): Track {
-    return this.trackRepository.update(id, update);
+  async update(id: string, update: Partial<Track>): Track {
+    return await this.trackRepository.update(id, update);
   }
 
-  delete(id: string): void {
-    this.trackRepository.delete(id);
-    this.favoritesService.cleanTrack(id);
+  async delete(id: string) {
+    await this.trackRepository.delete(id);
   }
 
-  removeArtist(artistId: string) {
-    this.trackRepository.removeArtist(artistId);
-  }
-
-  removeAlbum(albumId: string) {
-    this.trackRepository.removeAlbum(albumId);
-  }
+  // removeArtist(artistId: string) {
+  //   this.trackRepository.removeArtist(artistId);
+  // }
+  //
+  // removeAlbum(albumId: string) {
+  //   this.trackRepository.removeAlbum(albumId);
+  // }
 }
