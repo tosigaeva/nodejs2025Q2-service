@@ -34,7 +34,7 @@ export class TrackService {
     });
   }
 
-  async update(id: string, update: Partial<Track>): Track {
+  async update(id: string, update: Partial<Track>) {
     return await this.trackRepository.update(id, update);
   }
 

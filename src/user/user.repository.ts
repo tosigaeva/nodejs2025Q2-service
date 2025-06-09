@@ -15,13 +15,10 @@ export class UserRepository {
         version: true,
         createdAt: true,
         updatedAt: true,
+        password: true,
       },
     });
-    return users.map((user) => ({
-      ...user,
-      createdAt: user.createdAt.getTime(),
-      updatedAt: user.updatedAt.getTime(),
-    }));
+    return users.map(this.sanitizeUser);
   }
 
   async findById(id: string): Promise<User> {
@@ -33,14 +30,11 @@ export class UserRepository {
         version: true,
         createdAt: true,
         updatedAt: true,
+        password: true,
       },
     });
     if (!user) throw new NotFoundException('User not found');
-    return {
-      ...user,
-      createdAt: user.createdAt.getTime(),
-      updatedAt: user.updatedAt.getTime(),
-    };
+    return this.sanitizeUser(user);
   }
 
   async create(login: string, password: string) {
@@ -107,7 +101,7 @@ export class UserRepository {
   }
 
   private async getUnsanitizedUser(id: string) {
-    const user = await this.storage.user.findById(id);
+    const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }

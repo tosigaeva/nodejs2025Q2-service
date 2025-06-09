@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -26,15 +25,15 @@ export class UserService {
     }
   }
 
-  create(login: string, password: string): User {
+  async create(login: string, password: string) {
     if (!login?.trim() || !password?.trim()) {
       throw new BadRequestException('Login and password are required');
     }
 
-    return this.userRepository.create(login, password);
+    return await this.userRepository.create(login, password);
   }
 
-  updatePassword(id: string, oldPassword: string, newPassword: string): User {
+  async updatePassword(id: string, oldPassword: string, newPassword: string) {
     if (!newPassword?.trim()) {
       throw new BadRequestException('New password is required');
     }
@@ -43,7 +42,7 @@ export class UserService {
       throw new ForbiddenException('Old password is incorrect');
     }
 
-    const user = this.userRepository.findById(id);
+    const user = await this.userRepository.findById(id);
     const updatedUser = {
       ...user,
       password: newPassword,
@@ -51,7 +50,7 @@ export class UserService {
       updatedAt: Date.now(),
     };
 
-    return this.userRepository.update(updatedUser);
+    return await this.userRepository.update(updatedUser);
   }
 
   delete(id: string): void {
