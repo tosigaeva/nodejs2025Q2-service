@@ -7,7 +7,7 @@ import { PrismaService } from '../client/prisma.service';
 export class UserRepository {
   constructor(private storage: PrismaService) {}
 
-  async findAll(): Promise<User> {
+  async findAll(): Promise<User[]> {
     const users = await this.storage.user.findMany({
       select: {
         id: true,
