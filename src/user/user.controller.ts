@@ -72,7 +72,7 @@ export class UserController {
     status: 400,
     description: 'Invalid input data',
   })
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto.login, createUserDto.password);
   }
 

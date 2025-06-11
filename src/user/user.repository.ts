@@ -38,19 +38,10 @@ export class UserRepository {
   }
 
   async create(login: string, password: string) {
-    const newUser: User = {
-      id: randomUUID(),
-      login,
-      password,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-
-    await this.storage.user.create({
+    const newUser = await this.storage.user.create({
       data: {
-        login: newUser.login,
-        password: newUser.password,
+        login: login,
+        password: password,
         version: 1,
       },
       select: {
@@ -62,7 +53,7 @@ export class UserRepository {
       },
     });
 
-    return this.sanitizeUser(newUser);
+    return newUser;
   }
 
   async update(user: User) {
