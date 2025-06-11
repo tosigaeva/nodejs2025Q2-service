@@ -35,7 +35,7 @@ export class AlbumRepository {
   }
 
   async update(id: string, update: Partial<Album>): Promise<Album> {
-    const existing = await this.storage.album.findUnique({ where: { id } });
+    const existing = await this.findById(id);
     const updated = { ...existing, ...update };
     return this.storage.album.update({
       where: { id },
