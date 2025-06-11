@@ -5,6 +5,7 @@ import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from './client/prisma.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     AlbumModule,
     TrackModule,
     FavoritesModule,
+    PrismaModule,
   ],
 })
 export class AppModule {}
