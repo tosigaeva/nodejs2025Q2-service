@@ -37,7 +37,7 @@ export class TrackRepository {
   }
 
   async update(id: string, update: Partial<Track>): Promise<Track> {
-    const existing = await this.storage.track.findUnique({ where: { id } });
+    const existing = await this.findById(id);
     const updated = { ...existing, ...update };
     return this.storage.track.update({
       where: { id },
