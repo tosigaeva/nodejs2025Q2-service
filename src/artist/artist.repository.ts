@@ -29,7 +29,7 @@ export class ArtistRepository {
   }
 
   async update(id: string, updates: Partial<Artist>): Promise<Artist> {
-    const existing = this.findById(id);
+    const existing = await this.findById(id);
     const updated = { ...existing, ...updates };
     return this.storage.artist.update({
       where: { id },
