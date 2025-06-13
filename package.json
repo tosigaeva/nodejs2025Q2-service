@@ -24,6 +24,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "docker:up": "docker compose up --build --force-recreate -d",
+    "docker:scan": "docker scout cves tosigaeva/home-library-service:p2",
     "prisma:migrate": "npx prisma migrate dev --preview-feature --skip-generate"
   },
   "dependencies": {
