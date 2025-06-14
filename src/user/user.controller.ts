@@ -36,8 +36,8 @@ export class UserController {
     type: [User],
   })
   @Get()
-  async getAll(): Promise<User[]> {
-    return this.userService.getAll();
+  async getAll() {
+    return await this.userService.getAll();
   }
 
   @Get(':id')
@@ -57,7 +57,7 @@ export class UserController {
     description: 'User not found',
   })
   async getById(@Param('id', UuidValidationPipe) id: string): Promise<User> {
-    return this.userService.getById(id);
+    return await this.userService.getById(id);
   }
 
   @Post()
@@ -72,7 +72,7 @@ export class UserController {
     status: 400,
     description: 'Invalid input data',
   })
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto.login, createUserDto.password);
   }
 
@@ -101,7 +101,7 @@ export class UserController {
     @Param('id', UuidValidationPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): Promise<User> {
-    return this.userService.updatePassword(
+    return await this.userService.updatePassword(
       id,
       updatePasswordDto.oldPassword,
       updatePasswordDto.newPassword,
@@ -125,6 +125,6 @@ export class UserController {
     description: 'User not found',
   })
   async delete(@Param('id', UuidValidationPipe) id: string): Promise<void> {
-    return this.userService.delete(id);
+    await this.userService.delete(id);
   }
 }

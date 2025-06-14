@@ -1,48 +1,55 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Album } from './entities/album.entity';
-import { randomUUID } from 'crypto';
+import { PrismaService } from '../client/prisma.service';
+import { Album } from '@prisma/client';
 
 @Injectable()
 export class AlbumRepository {
-  private albums = new Map<string, Album>();
+  constructor(private storage: PrismaService) {}
 
-  findAll(): Album[] {
-    return Array.from(this.albums.values());
+  async findAll(): Promise<Album[]> {
+    return this.storage.album.findMany();
   }
 
-  findById(id: string): Album {
-    const album = this.albums.get(id);
+  async findById(id: string): Promise<Album> {
+    const album = await this.storage.album.findUnique({ where: { id } });
     if (!album) {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
     return album;
   }
 
-  create(name: string, year: number, artistId: string | null): Album {
-    const album: Album = {
-      id: randomUUID(),
-      name,
-      year,
-      artistId: artistId ?? null,
-    };
-    this.albums.set(album.id, album);
-    return album;
-  }
-
-  update(id: string, update: Partial<Album>): Album {
-    const existing = this.findById(id);
-    const updated = { ...existing, ...update };
-    this.albums.set(id, updated);
-    return updated;
-  }
-
-  delete(id: string): boolean {
-    return this.albums.delete(id);
-  }
-
-  removeArtist(artistId: string) {
-    this.albums.forEach((album) => {
-      if (album.artistId === artistId) album.artistId = null;
+  async create(
+    name: string,
+    year: number,
+    artistId: string | null,
+  ): Promise<Album> {
+    return this.storage.album.create({
+      data: {
+        name: name,
+        year: year,
+        artist: {
+          connect: artistId ? { id: artistId } : undefined,
+        },
+      },
     });
+  }
+
+  async update(id: string, update: Partial<Album>): Promise<Album> {
+    const existing = await this.findById(id);
+    const updated = { ...existing, ...update };
+    return this.storage.album.update({
+      where: { id },
+      data: {
+        name: updated.name,
+        year: updated.year,
+        artist: {
+          connect: updated.artistId ? { id: updated.artistId } : undefined,
+        },
+      },
+    });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.storage.album.delete({ where: { id } });
   }
 }

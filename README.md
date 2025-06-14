@@ -5,29 +5,31 @@
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 
-## Downloading
+## Getting Started
+
+### 1. Clone the repository
 
 ```
 git clone https://github.com/tosigaeva/nodejs2025Q2-service.git
 ```
 
-## Changing directory
+## 2. Changing directory
 ```
 cd nodejs2025Q2-service
 ```
 
-## Switching branch
+## 3. Switching branch
 ```
-git switch rest-service
-```
-
-## Installing NPM modules
-
-```
-npm install
+git switch develop
 ```
 
-## Running application
+## 4. Start services with Docker
+
+```
+npm run docker:up
+```
+
+## 5. Running application
 
 ```
 npm start

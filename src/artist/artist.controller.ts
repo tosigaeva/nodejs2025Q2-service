@@ -33,8 +33,8 @@ export class ArtistController {
     status: 200,
     type: [Artist],
   })
-  getAll(): Artist[] {
-    return this.artistService.getAll();
+  async getAll() {
+    return await this.artistService.getAll();
   }
 
   @Get(':id')
@@ -43,16 +43,16 @@ export class ArtistController {
   @ApiResponse({ status: 200, type: Artist })
   @ApiResponse({ status: 400, description: 'Invalid UUID' })
   @ApiResponse({ status: 404, description: 'Artist not found' })
-  getById(@Param('id', UuidValidationPipe) id: string): Artist {
-    return this.artistService.getById(id);
+  async getById(@Param('id', UuidValidationPipe) id: string) {
+    return await this.artistService.getById(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create artist' })
   @ApiBody({ type: CreateArtistDto })
   @ApiResponse({ status: 201, type: Artist })
-  create(@Body() dto: CreateArtistDto): Artist {
-    return this.artistService.create(dto.name, dto.grammy);
+  async create(@Body() dto: CreateArtistDto) {
+    return await this.artistService.create(dto.name, dto.grammy);
   }
 
   @Put(':id')
@@ -62,11 +62,11 @@ export class ArtistController {
   @ApiResponse({ status: 200, type: Artist })
   @ApiResponse({ status: 400, description: 'Invalid UUID' })
   @ApiResponse({ status: 404, description: 'Artist not found' })
-  update(
+  async update(
     @Param('id', UuidValidationPipe) id: string,
     @Body() dto: UpdateArtistDto,
-  ): Artist {
-    return this.artistService.update(id, dto);
+  ) {
+    return await this.artistService.update(id, dto);
   }
 
   @Delete(':id')
@@ -76,7 +76,7 @@ export class ArtistController {
   @ApiResponse({ status: 204 })
   @ApiResponse({ status: 400, description: 'Invalid UUID' })
   @ApiResponse({ status: 404, description: 'Artist not found' })
-  delete(@Param('id', UuidValidationPipe) id: string): void {
-    this.artistService.delete(id);
+  async delete(@Param('id', UuidValidationPipe) id: string) {
+    await this.artistService.delete(id);
   }
 }

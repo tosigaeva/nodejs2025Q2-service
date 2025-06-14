@@ -30,8 +30,8 @@ export class TrackController {
   @Get()
   @ApiOperation({ summary: 'Get all tracks' })
   @ApiResponse({ status: 200, type: [Track] })
-  getAll(): Track[] {
-    return this.trackService.getAll();
+  async getAll() {
+    return await this.trackService.getAll();
   }
 
   @Get(':id')
@@ -39,16 +39,16 @@ export class TrackController {
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, type: Track })
   @ApiResponse({ status: 404, description: 'Track not found' })
-  getById(@Param('id', UuidValidationPipe) id: string): Track {
-    return this.trackService.getById(id);
+  async getById(@Param('id', UuidValidationPipe) id: string) {
+    return await this.trackService.getById(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create track' })
   @ApiBody({ type: CreateTrackDto })
   @ApiResponse({ status: 201, type: Track })
-  create(@Body() dto: CreateTrackDto): Track {
-    return this.trackService.create(
+  async create(@Body() dto: CreateTrackDto) {
+    return await this.trackService.create(
       dto.name,
       dto.duration,
       dto.artistId,
@@ -61,11 +61,11 @@ export class TrackController {
   @ApiParam({ name: 'id', type: String })
   @ApiBody({ type: UpdateTrackDto })
   @ApiResponse({ status: 200, type: Track })
-  update(
+  async update(
     @Param('id', UuidValidationPipe) id: string,
     @Body() dto: UpdateTrackDto,
-  ): Track {
-    return this.trackService.update(id, dto);
+  ) {
+    return await this.trackService.update(id, dto);
   }
 
   @Delete(':id')
@@ -73,7 +73,7 @@ export class TrackController {
   @ApiOperation({ summary: 'Delete track' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 204, description: 'Track deleted' })
-  delete(@Param('id', UuidValidationPipe) id: string): void {
-    this.trackService.delete(id);
+  async delete(@Param('id', UuidValidationPipe) id: string) {
+    await this.trackService.delete(id);
   }
 }
