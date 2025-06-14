@@ -49,8 +49,4 @@ export class AlbumService {
     // this.trackService.removeAlbum(id);
     // this.favoritesService.cleanAlbum(id);
   }
-
-  removeArtist(artistId: string) {
-    this.albumRepository.removeArtist(artistId);
-  }
 }

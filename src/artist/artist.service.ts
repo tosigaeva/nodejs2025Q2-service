@@ -48,9 +48,5 @@ export class ArtistService {
     } catch {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
-
-    this.albumService.removeArtist(id);
-    // this.trackService.removeArtist(id);
-    // this.favoritesService.cleanArtist(id);
   }
 }

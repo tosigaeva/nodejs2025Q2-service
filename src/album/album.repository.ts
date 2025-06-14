@@ -52,9 +52,4 @@ export class AlbumRepository {
   async delete(id: string): Promise<void> {
     await this.storage.album.delete({ where: { id } });
   }
-
-  async removeArtist(): Promise<void> {
-    const albums = await this.findAll();
-    albums.forEach(async () => {});
-  }
 }
