@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { JwtGuard } from './auth/jwt.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,19 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
     }),
+  );
+
+  app.useGlobalGuards(
+    new (class extends JwtGuard {
+      canActivate(context) {
+        const request = context.switchToHttp().getRequest();
+        const { url } = request;
+        if (url === '/' || url.startsWith('/auth/') || url.startsWith('/doc')) {
+          return true;
+        }
+        return super.canActivate(context);
+      }
+    })(),
   );
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });

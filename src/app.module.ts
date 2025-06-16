@@ -7,6 +7,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './client/prisma.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtStrategy } from './auth/jwt.strategy';
 
 @Module({
   imports: [
@@ -21,5 +22,6 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     AuthModule,
   ],
+  providers: [JwtStrategy],
 })
 export class AppModule {}
