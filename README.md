@@ -82,3 +82,9 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+### Logs
+
+You can change the  logging level and max file size.
+Open the `.env` file and set the desired variable.
+Application logs are stored in the `logs` directory.
