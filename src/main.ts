@@ -7,11 +7,13 @@ import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from './auth/jwt.guard';
 import { LoggingService } from './logging/logging.service';
 import { Request, Response, NextFunction } from 'express';
+import { LogExceptionFilter } from './logging/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const loggingService = app.get(LoggingService);
   app.useLogger(loggingService);
+  app.useGlobalFilters(new LogExceptionFilter(loggingService));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
