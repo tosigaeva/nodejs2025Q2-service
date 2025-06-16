@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './client/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { JwtStrategy } from './auth/jwt.strategy';
     FavoritesModule,
     PrismaModule,
     AuthModule,
+    LoggingModule,
   ],
   providers: [JwtStrategy],
 })
