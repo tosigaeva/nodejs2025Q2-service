@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  app:
+    image: tosigaeva/home-library-service:p3
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+    restart: always
+    env_file: .env
+    networks:
+      - library-net
+  db:
+    image: postgres:13-alpine
+    container_name: db
+    restart: always
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - library-net
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    depends_on:
+      - app
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+  db_migrate:
+    build: .
+    restart: 'on-failure'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - library-net
+    env_file: .env
+    command: npm run prisma:migrate
+networks:
+  library-net:
+    driver: bridge
+volumes:
+  pgdata:

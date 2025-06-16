@@ -20,40 +20,40 @@ export class FavoritesController {
   @Get()
   @ApiOperation({ summary: 'Get all favorites' })
   @ApiResponse({ status: 200, type: [Favorites] })
-  getAll() {
-    return this.favoritesService.getAll();
+  async getAll() {
+    return await this.favoritesService.getAll();
   }
 
   @Post('track/:id')
   @ApiOperation({ summary: 'Add track to favorites' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 201 })
-  addTrack(@Param('id', UuidValidationPipe) id: string): void {
-    this.favoritesService.addTrack(id);
+  async addTrack(@Param('id', UuidValidationPipe) id: string) {
+    await this.favoritesService.addTrack(id);
   }
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove track from favorites' })
   @ApiResponse({ status: 204 })
-  removeTrack(@Param('id', UuidValidationPipe) id: string): void {
-    this.favoritesService.removeTrack(id);
+  async removeTrack(@Param('id', UuidValidationPipe) id: string) {
+    await this.favoritesService.removeTrack(id);
   }
 
   @Post('album/:id')
   @ApiOperation({ summary: 'Add album to favorites' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 201 })
-  addAlbum(@Param('id', UuidValidationPipe) id: string): void {
-    this.favoritesService.addAlbum(id);
+  async addAlbum(@Param('id', UuidValidationPipe) id: string) {
+    await this.favoritesService.addAlbum(id);
   }
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove album from favorites' })
   @ApiResponse({ status: 204 })
-  removeAlbum(@Param('id', UuidValidationPipe) id: string): void {
-    this.favoritesService.removeAlbum(id);
+  async removeAlbum(@Param('id', UuidValidationPipe) id: string) {
+    await this.favoritesService.removeAlbum(id);
   }
 
   @Post('artist/:id')
@@ -66,15 +66,15 @@ export class FavoritesController {
   })
   @ApiResponse({ status: 400, description: 'Invalid UUID.' })
   @ApiResponse({ status: 422, description: 'Artist not found' })
-  addArtist(@Param('id', UuidValidationPipe) id: string): void {
-    this.favoritesService.addArtist(id);
+  async addArtist(@Param('id', UuidValidationPipe) id: string) {
+    await this.favoritesService.addArtist(id);
   }
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove artist from favorites' })
   @ApiResponse({ status: 204 })
-  removeArtist(@Param('id', UuidValidationPipe) id: string): void {
-    this.favoritesService.removeArtist(id);
+  async removeArtist(@Param('id', UuidValidationPipe) id: string) {
+    await this.favoritesService.removeArtist(id);
   }
 }

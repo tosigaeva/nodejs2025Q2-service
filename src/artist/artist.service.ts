@@ -23,31 +23,30 @@ export class ArtistService {
     private readonly favoritesService: FavoritesService,
   ) {}
 
-  getAll(): Artist[] {
+  async getAll(): Promise<Artist[]> {
     return this.artistRepository.findAll();
   }
 
-  getById(id: string): Artist {
-    return this.artistRepository.findById(id);
+  async getById(id: string) {
+    return await this.artistRepository.findById(id);
   }
 
-  create(name: string, grammy: boolean): Artist {
+  async create(name: string, grammy: boolean): Promise<Artist> {
     if (!name?.trim()) {
       throw new BadRequestException('Name is required');
     }
-    return this.artistRepository.create(name, grammy);
+    return await this.artistRepository.create(name, grammy);
   }
 
-  update(id: string, data: Partial<Artist>): Artist {
-    return this.artistRepository.update(id, data);
+  async update(id: string, data: Partial<Artist>): Promise<Artist> {
+    return await this.artistRepository.update(id, data);
   }
 
-  delete(id: string): void {
-    if (!this.artistRepository.delete(id)) {
+  async delete(id: string) {
+    try {
+      await this.artistRepository.delete(id);
+    } catch {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
-    this.albumService.removeArtist(id);
-    this.trackService.removeArtist(id);
-    this.favoritesService.cleanArtist(id);
   }
 }

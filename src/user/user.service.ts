@@ -5,19 +5,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  getAll(): User[] {
-    return this.userRepository.findAll();
+  async getAll() {
+    return await this.userRepository.findAll();
   }
 
-  getById(id: string): User {
+  async getById(id: string) {
     try {
-      return this.userRepository.findById(id);
+      return await this.userRepository.findById(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(`User with id ${id} not found`);
@@ -26,24 +25,24 @@ export class UserService {
     }
   }
 
-  create(login: string, password: string): User {
+  async create(login: string, password: string) {
     if (!login?.trim() || !password?.trim()) {
       throw new BadRequestException('Login and password are required');
     }
 
-    return this.userRepository.create(login, password);
+    return await this.userRepository.create(login, password);
   }
 
-  updatePassword(id: string, oldPassword: string, newPassword: string): User {
+  async updatePassword(id: string, oldPassword: string, newPassword: string) {
     if (!newPassword?.trim()) {
       throw new BadRequestException('New password is required');
     }
 
-    if (!this.userRepository.validatePassword(id, oldPassword)) {
+    const user = await this.userRepository.findById(id);
+    if (!(await this.userRepository.validatePassword(id, oldPassword))) {
       throw new ForbiddenException('Old password is incorrect');
     }
 
-    const user = this.userRepository.findById(id);
     const updatedUser = {
       ...user,
       password: newPassword,
@@ -51,12 +50,12 @@ export class UserService {
       updatedAt: Date.now(),
     };
 
-    return this.userRepository.update(updatedUser);
+    return await this.userRepository.update(updatedUser);
   }
 
-  delete(id: string): void {
+  async delete(id: string): Promise<void> {
     try {
-      this.userRepository.delete(id);
+      await this.userRepository.delete(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(`User with id ${id} not found`);

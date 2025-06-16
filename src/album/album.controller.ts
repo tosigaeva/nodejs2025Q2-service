@@ -30,8 +30,8 @@ export class AlbumController {
   @Get()
   @ApiOperation({ summary: 'Get all albums' })
   @ApiResponse({ status: 200, type: [Album] })
-  getAll(): Album[] {
-    return this.albumService.getAll();
+  async getAll(): Promise<Album[]> {
+    return await this.albumService.getAll();
   }
 
   @Get(':id')
@@ -39,16 +39,20 @@ export class AlbumController {
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 200, type: Album })
   @ApiResponse({ status: 404, description: 'Album not found' })
-  getById(@Param('id', UuidValidationPipe) id: string): Album {
-    return this.albumService.getById(id);
+  async getById(@Param('id', UuidValidationPipe) id: string): Promise<Album> {
+    return await this.albumService.getById(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create album' })
   @ApiBody({ type: CreateAlbumDto })
   @ApiResponse({ status: 201, type: Album })
-  create(@Body() dto: CreateAlbumDto): Album {
-    return this.albumService.create(dto.name, dto.year, dto.artistId ?? null);
+  async create(@Body() dto: CreateAlbumDto): Promise<Album> {
+    return await this.albumService.create(
+      dto.name,
+      dto.year,
+      dto.artistId ?? null,
+    );
   }
 
   @Put(':id')
@@ -56,11 +60,11 @@ export class AlbumController {
   @ApiParam({ name: 'id', type: String })
   @ApiBody({ type: UpdateAlbumDto })
   @ApiResponse({ status: 200, type: Album })
-  update(
+  async update(
     @Param('id', UuidValidationPipe) id: string,
     @Body() dto: UpdateAlbumDto,
-  ): Album {
-    return this.albumService.update(id, dto);
+  ): Promise<Album> {
+    return await this.albumService.update(id, dto);
   }
 
   @Delete(':id')
@@ -68,7 +72,7 @@ export class AlbumController {
   @ApiOperation({ summary: 'Delete album' })
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 204, description: 'Album deleted' })
-  delete(@Param('id', UuidValidationPipe) id: string): void {
-    this.albumService.delete(id);
+  async delete(@Param('id', UuidValidationPipe) id: string) {
+    await this.albumService.delete(id);
   }
 }
