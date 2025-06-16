@@ -21,11 +21,15 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { LoggingService } from '../logging/logging.service';
 
 @ApiTags('Artists')
 @Controller('artist')
 export class ArtistController {
-  constructor(private readonly artistService: ArtistService) {}
+  constructor(
+    private readonly artistService: ArtistService,
+    private readonly loggingService: LoggingService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all artists' })
@@ -34,6 +38,8 @@ export class ArtistController {
     type: [Artist],
   })
   async getAll() {
+    this.loggingService.log('Getting all artists', 'Artists');
+
     return await this.artistService.getAll();
   }
 
@@ -44,6 +50,8 @@ export class ArtistController {
   @ApiResponse({ status: 400, description: 'Invalid UUID' })
   @ApiResponse({ status: 404, description: 'Artist not found' })
   async getById(@Param('id', UuidValidationPipe) id: string) {
+    this.loggingService.log(`Getting artist by id: ${id}`, 'Artists');
+
     return await this.artistService.getById(id);
   }
 
@@ -52,6 +60,7 @@ export class ArtistController {
   @ApiBody({ type: CreateArtistDto })
   @ApiResponse({ status: 201, type: Artist })
   async create(@Body() dto: CreateArtistDto) {
+    this.loggingService.log(`Creating artist: ${dto.name}`, 'Artists');
     return await this.artistService.create(dto.name, dto.grammy);
   }
 
@@ -66,6 +75,8 @@ export class ArtistController {
     @Param('id', UuidValidationPipe) id: string,
     @Body() dto: UpdateArtistDto,
   ) {
+    this.loggingService.log(`Updating artist: ${id}`, 'Artists');
+
     return await this.artistService.update(id, dto);
   }
 
@@ -77,6 +88,7 @@ export class ArtistController {
   @ApiResponse({ status: 400, description: 'Invalid UUID' })
   @ApiResponse({ status: 404, description: 'Artist not found' })
   async delete(@Param('id', UuidValidationPipe) id: string) {
+    this.loggingService.log(`Removing artist: ${id}`, 'Artists');
     await this.artistService.delete(id);
   }
 }

@@ -21,16 +21,22 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { LoggingService } from '../logging/logging.service';
 
 @ApiTags('Albums')
 @Controller('album')
 export class AlbumController {
-  constructor(private readonly albumService: AlbumService) {}
+  constructor(
+    private readonly albumService: AlbumService,
+    private readonly loggingService: LoggingService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all albums' })
   @ApiResponse({ status: 200, type: [Album] })
   async getAll(): Promise<Album[]> {
+    this.loggingService.log('Getting all albums', 'Albums');
+
     return await this.albumService.getAll();
   }
 
@@ -40,6 +46,8 @@ export class AlbumController {
   @ApiResponse({ status: 200, type: Album })
   @ApiResponse({ status: 404, description: 'Album not found' })
   async getById(@Param('id', UuidValidationPipe) id: string): Promise<Album> {
+    this.loggingService.log(`Getting album by id: ${id}`, 'Albums');
+
     return await this.albumService.getById(id);
   }
 
@@ -48,6 +56,8 @@ export class AlbumController {
   @ApiBody({ type: CreateAlbumDto })
   @ApiResponse({ status: 201, type: Album })
   async create(@Body() dto: CreateAlbumDto): Promise<Album> {
+    this.loggingService.log(`Creating album: ${dto.name}`, 'Albums');
+
     return await this.albumService.create(
       dto.name,
       dto.year,
@@ -64,6 +74,8 @@ export class AlbumController {
     @Param('id', UuidValidationPipe) id: string,
     @Body() dto: UpdateAlbumDto,
   ): Promise<Album> {
+    this.loggingService.log(`Updating album: ${id}`, 'Albums');
+
     return await this.albumService.update(id, dto);
   }
 
@@ -73,6 +85,7 @@ export class AlbumController {
   @ApiParam({ name: 'id', type: String })
   @ApiResponse({ status: 204, description: 'Album deleted' })
   async delete(@Param('id', UuidValidationPipe) id: string) {
+    this.loggingService.log(`Removing album: ${id}`, 'Albums');
     await this.albumService.delete(id);
   }
 }

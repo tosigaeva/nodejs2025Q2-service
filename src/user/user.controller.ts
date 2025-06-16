@@ -22,12 +22,16 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { LoggingService } from '../logging/logging.service';
 
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly loggingService: LoggingService,
+  ) {}
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({
@@ -37,6 +41,7 @@ export class UserController {
   })
   @Get()
   async getAll() {
+    this.loggingService.log('Getting all users', 'Users');
     return await this.userService.getAll();
   }
 
@@ -57,6 +62,7 @@ export class UserController {
     description: 'User not found',
   })
   async getById(@Param('id', UuidValidationPipe) id: string): Promise<User> {
+    this.loggingService.log(`Getting user by id: ${id}`, 'Users');
     return await this.userService.getById(id);
   }
 
@@ -73,6 +79,7 @@ export class UserController {
     description: 'Invalid input data',
   })
   async create(@Body() createUserDto: CreateUserDto) {
+    this.loggingService.log(`Creating user: ${createUserDto.login}`, 'Users');
     return this.userService.create(createUserDto.login, createUserDto.password);
   }
 
@@ -101,6 +108,7 @@ export class UserController {
     @Param('id', UuidValidationPipe) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): Promise<User> {
+    this.loggingService.debug(`Updating password for user: ${id}`, 'Users');
     return await this.userService.updatePassword(
       id,
       updatePasswordDto.oldPassword,
@@ -125,6 +133,7 @@ export class UserController {
     description: 'User not found',
   })
   async delete(@Param('id', UuidValidationPipe) id: string): Promise<void> {
+    this.loggingService.warn(`Deleting user: ${id}`, 'Users');
     await this.userService.delete(id);
   }
 }

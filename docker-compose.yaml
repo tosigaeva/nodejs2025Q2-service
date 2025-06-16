@@ -1,12 +1,13 @@
 version: '3.8'
 services:
   app:
-    image: tosigaeva/home-library-service:p3
+    build: .
     ports:
       - '${PORT}:${PORT}'
     volumes:
       - ./src:/app/src
       - ./prisma:/app/prisma
+      - ./logs:/app/logs
     restart: always
     env_file: .env
     networks:

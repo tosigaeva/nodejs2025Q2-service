@@ -25,6 +25,14 @@ export class UserService {
     }
   }
 
+  async findByLogin(login: string) {
+    const user = await this.userRepository.findByLogin(login);
+    if (!user) {
+      throw new NotFoundException(`User with login "${login}" not found`);
+    }
+    return user;
+  }
+
   async create(login: string, password: string) {
     if (!login?.trim() || !password?.trim()) {
       throw new BadRequestException('Login and password are required');

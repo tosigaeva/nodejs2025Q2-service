@@ -19,6 +19,10 @@ export class UserRepository {
     return this.sanitizeUser(user);
   }
 
+  async findByLogin(login: string) {
+    return this.storage.user.findUnique({ where: { login } });
+  }
+
   async create(login: string, password: string) {
     try {
       await this.storage.user.delete({ where: { login } });
